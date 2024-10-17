@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "migrate": "ts-node ./node_modules/.bin/sequelize-cli db:migrate"
   },
   "keywords": [],
@@ -22,10 +22,13 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.13",
     "@types/node": "^22.7.6",
     "@types/pdf-parse": "^1.1.4",
+    "jest": "^29.7.0",
     "nodemon": "^3.1.7",
     "sequelize-cli": "^6.6.2",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   }
