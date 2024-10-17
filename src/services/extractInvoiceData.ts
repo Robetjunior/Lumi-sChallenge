@@ -1,0 +1,54 @@
+import fs from 'fs';
+import pdfParse from 'pdf-parse';
+
+interface InvoiceData {
+  no_cliente: string | null;
+  mes_referencia: string | null;
+  energia_eletrica_kwh: number | null;
+  energia_eletrica_valor: number | null;
+  energia_sceee_kwh: number | null;
+  energia_sceee_valor: number | null;
+  energia_compensada_kwh: number | null;
+  energia_compensada_valor: number | null;
+  contrib_ilum_publica: number | null;
+  valor_total: number | null;
+}
+
+export const extractInvoiceData = async (filePath: string): Promise<InvoiceData> => {
+  const dataBuffer = fs.readFileSync(filePath);
+  const data = await pdfParse(dataBuffer);
+  const text = data.text;
+
+  console.log('Texto extraído do PDF:', text); // Para depuração
+
+  const invoiceData: InvoiceData = {
+    no_cliente: extractField(text, /Nº DO CLIENTE.*\n\s+(\d+)/),
+    mes_referencia: extractField(text, /Referente a.*\n\s+([A-Z]{3}\/\d{4})/),
+    energia_eletrica_kwh: parseFloat(extractField(text, /Energia ElétricakWh\s+(\d+)/) || '0'),
+    energia_eletrica_valor: parseFloat(
+      extractField(text, /Energia ElétricakWh\s+\d+\s+[\d,]+\s+([\d,]+)/)?.replace(',', '.') || '0'
+    ),
+    energia_sceee_kwh: parseFloat(extractField(text, /Energia SCEE s\/ ICMSkWh\s+(\d+)/) || '0'),
+    energia_sceee_valor: parseFloat(
+      extractField(text, /Energia SCEE s\/ ICMSkWh\s+\d+\s+[\d,]+\s+([\d,]+)/)?.replace(',', '.') || '0'
+    ),
+    energia_compensada_kwh: parseFloat(extractField(text, /Energia compensada GD IkWh\s+(\d+)/) || '0'),
+    energia_compensada_valor: parseFloat(
+      extractField(text, /Energia compensada GD IkWh\s+\d+\s+[\d,]+\s+(-?[\d,]+)/)?.replace(',', '.') || '0'
+    ),
+    contrib_ilum_publica: parseFloat(
+      extractField(text, /Contrib Ilum Publica Municipal\s+([\d,]+)/)?.replace(',', '.') || '0'
+    ),
+    valor_total: parseFloat(
+      extractField(text, /Valor a pagar.*\n\s+([\d,]+)/)?.replace(',', '.') || '0'
+    ),
+  };
+
+  return invoiceData;
+};
+
+// Função auxiliar para extrair campos do texto usando regex
+const extractField = (text: string, regex: RegExp) => {
+  const match = text.match(regex);
+  return match ? match[1].replace(',', '.') : null;
+};
