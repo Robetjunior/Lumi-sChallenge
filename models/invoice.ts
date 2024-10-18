@@ -1,88 +1,92 @@
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 
-// Interface para tipar o modelo
+// Definição dos atributos do modelo Invoice
 interface InvoiceAttributes {
-  no_cliente: string | null;
-  mes_referencia: string | null;
-  energia_eletrica_kwh: number | null;
-  energia_eletrica_valor: number | null;
-  energia_sceee_kwh: number | null;
-  energia_sceee_valor: number | null;
-  energia_compensada_kwh: number | null;
-  energia_compensada_valor: number | null;
-  contrib_ilum_publica: number | null;
-  valor_total: number | null;
+  id: number;
+  no_cliente: string;
+  mes_referencia: string;
+  energia_eletrica_kwh: number;
+  energia_eletrica_valor: number;
+  energia_sceee_kwh: number;
+  energia_sceee_valor: number;
+  energia_compensada_kwh: number;
+  energia_compensada_valor: number;
+  contrib_ilum_publica: number;
+  valor_total: number;
 }
 
-class Invoice extends Model<InvoiceAttributes> implements InvoiceAttributes {
-  no_cliente!: string | null;
-  mes_referencia!: string | null;
-  energia_eletrica_kwh!: number | null;
-  energia_eletrica_valor!: number | null;
-  energia_sceee_kwh!: number | null;
-  energia_sceee_valor!: number | null;
-  energia_compensada_kwh!: number | null;
-  energia_compensada_valor!: number | null;
-  contrib_ilum_publica!: number | null;
-  valor_total!: number | null;
+// Tipagem para criação do modelo (campos opcionais durante a criação)
+interface InvoiceCreationAttributes extends Optional<InvoiceAttributes, 'id'> {}
 
-  static associate(models: any) {
-    // Definir associações, se necessário
-  }
+// Definição do modelo Invoice
+export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
+  implements InvoiceAttributes {
+  public id!: number;
+  public no_cliente!: string;
+  public mes_referencia!: string;
+  public energia_eletrica_kwh!: number;
+  public energia_eletrica_valor!: number;
+  public energia_sceee_kwh!: number;
+  public energia_sceee_valor!: number;
+  public energia_compensada_kwh!: number;
+  public energia_compensada_valor!: number;
+  public contrib_ilum_publica!: number;
+  public valor_total!: number;
+
+  // Timestamps
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
-// Inicializar o modelo
-const initializeInvoiceModel = (sequelize: Sequelize) => {
+// Função para inicializar o modelo Invoice
+export function initializeInvoiceModel(sequelize: Sequelize) {
   Invoice.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       no_cliente: {
         type: DataTypes.STRING,
-        allowNull: true, // Permitir null
+        allowNull: false,
       },
       mes_referencia: {
         type: DataTypes.STRING,
-        allowNull: true, // Permitir null
+        allowNull: false,
       },
       energia_eletrica_kwh: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.INTEGER,
       },
       energia_eletrica_valor: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.DOUBLE,
       },
       energia_sceee_kwh: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.INTEGER,
       },
       energia_sceee_valor: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.DOUBLE,
       },
       energia_compensada_kwh: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.INTEGER,
       },
       energia_compensada_valor: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.DOUBLE,
       },
       contrib_ilum_publica: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.DOUBLE,
       },
       valor_total: {
-        type: DataTypes.FLOAT,
-        allowNull: true, // Permitir null
+        type: DataTypes.DOUBLE,
       },
     },
     {
       sequelize,
       modelName: 'Invoice',
+      tableName: 'Invoices',
+      timestamps: true,
     }
   );
-
+  
   return Invoice;
-};
-
-export { Invoice, initializeInvoiceModel };
+}
