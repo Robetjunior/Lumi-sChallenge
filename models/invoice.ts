@@ -49,11 +49,11 @@ export function initializeInvoiceModel(sequelize: Sequelize) {
       },
       no_cliente: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true, // Permitir valores nulos
       },
       mes_referencia: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       energia_eletrica_kwh: {
         type: DataTypes.INTEGER,
