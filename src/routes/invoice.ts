@@ -1,8 +1,11 @@
 import { Router } from 'express';
+import { supabase } from '../../config/supabase';
+import fs from 'fs';
+import { extractInvoiceData } from '../services/extractInvoiceData'; // Função para extração de dados do PDF
+import { Invoice } from '../../models/invoice'; // Seu modelo de banco de dados
+import { Op } from 'sequelize';
 import multer from 'multer';
-import { extractInvoiceData } from '../services/extractInvoiceData'; // Certifique-se de ajustar o caminho conforme necessário
-import { Invoice } from '../../models/invoice';
-import fs from 'fs'; 
+
 
 // Configuração do multer para receber arquivos PDF
 const upload = multer({ dest: 'uploads/' }); // Os arquivos enviados serão armazenados na pasta 'uploads'
@@ -26,13 +29,37 @@ router.post('/', upload.single('fatura_pdf'), async (req: any, res: any) => {
   }
 
   const filePath = req.file.path; // Caminho temporário onde o arquivo foi salvo
+  const fileName = req.file.filename; // Nome do arquivo
+  const bucketName = 'faturas'; // Nome do bucket no Supabase
+
   try {
+    // Verificar se o arquivo realmente existe
+    if (!fs.existsSync(filePath)) {
+      throw new Error('Arquivo PDF não encontrado no caminho fornecido.');
+    }
+
     // Extração dos dados da fatura a partir do arquivo PDF
     const invoiceData = await extractInvoiceData(filePath);
 
+    // Ler o arquivo como um buffer
+    const fileBuffer = fs.readFileSync(filePath);
+
+    // Realizar upload do arquivo PDF no Supabase
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(`faturas/${fileName}.pdf`, fileBuffer, {
+        contentType: 'application/pdf',
+      });
+
+    if (uploadError) {
+      throw new Error(`Erro ao enviar o arquivo para o Supabase: ${uploadError.message}`);
+    }
+
+    console.log(`Upload realizado com sucesso: ${uploadData.path}`);
+
     // Sanitizar dados: Garantir que os campos obrigatórios não tenham valor null
     const sanitizedInvoiceData = {
-      no_cliente: invoiceData.no_cliente || '', // Substitua null por string vazia
+      no_cliente: invoiceData.no_cliente || '',
       mes_referencia: invoiceData.mes_referencia || '',
       energia_eletrica_kwh: invoiceData.energia_eletrica_kwh || 0,
       energia_eletrica_valor: invoiceData.energia_eletrica_valor || 0,
@@ -42,12 +69,14 @@ router.post('/', upload.single('fatura_pdf'), async (req: any, res: any) => {
       energia_compensada_valor: invoiceData.energia_compensada_valor || 0,
       contrib_ilum_publica: invoiceData.contrib_ilum_publica || 0,
       valor_total: invoiceData.valor_total || 0,
+      nome_uc: invoiceData.nome_uc || '',
+      distribuidora: invoiceData.distribuidora || ''
     };
 
     // Salvar os dados extraídos no banco de dados
     const newInvoice = await Invoice.create(sanitizedInvoiceData);
 
-    // Remover o arquivo PDF após o processamento
+    // Remover o arquivo PDF local após o upload
     fs.unlink(filePath, (err) => {
       if (err) {
         console.error(`Erro ao remover o arquivo: ${filePath}`, err);
@@ -86,7 +115,34 @@ router.put('/:id', async (req:any, res:any) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/search', async (req: any, res: any) => {
+  console.log('entrou aqui?')
+  const { distributor, consumer, year } = req.query;
+  console.log(distributor, consumer, year)
+  const whereClause: any = {};
+
+  // Aplicar filtros se eles existirem
+  if (distributor) {
+    whereClause.distributor = distributor;
+  }
+
+  if (consumer) {
+    whereClause.consumer = { [Op.like]: `%${consumer}%` }; 
+  }
+
+  if (year) {
+    whereClause.mes_referencia = { [Op.like]: `%${year}%` }; 
+  }
+
+  try {
+    const invoices = await Invoice.findAll({ where: whereClause });
+    res.json(invoices);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar faturas' });
+  }
+});
+
+router.get('/:id', async (req: any, res: any) => {
   const { id } = req.params;
   console.log(id)
   try {
@@ -102,15 +158,6 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     // Trata erros de conexão ou consulta ao banco
     res.status(500).json({ error: 'Erro ao buscar fatura' });
-  }
-});
-
-router.post('/', async (req: any, res: any) => {
-  try {
-    const newInvoice = await Invoice.create(req.body);
-    res.status(201).json(newInvoice);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao inserir fatura' });
   }
 });
 
@@ -144,7 +191,7 @@ router.delete('/:id', async (req:any, res:any) => {
 });
 
 // Cálculo de Consumo de Energia Elétrica (kWh) e Valor Total sem GD (R$)
-router.get('/calculos/:no_cliente/:mes_referencia', async (req:any, res:any) => {
+router.get('/calculos/:no_cliente/:mes_referencia', async (req: any, res: any) => {
   const { no_cliente, mes_referencia } = req.params;
   try {
     const invoice = await Invoice.findOne({ where: { no_cliente, mes_referencia } });

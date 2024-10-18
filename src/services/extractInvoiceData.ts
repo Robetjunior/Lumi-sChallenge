@@ -12,6 +12,8 @@ interface InvoiceData {
   energia_compensada_valor: number | null;
   contrib_ilum_publica: number | null;
   valor_total: number | null;
+  nome_uc: string | null;
+  distribuidora: string | null;
 }
 
 export const extractInvoiceData = async (filePath: string): Promise<InvoiceData> => {
@@ -42,6 +44,8 @@ export const extractInvoiceData = async (filePath: string): Promise<InvoiceData>
     valor_total: parseFloat(
       extractField(text, /Total\s+a\s+pagar.*\n.*R\$\s*([\d.,]+)/)?.replace('.', '').replace(',', '.') || '0'
     ),
+    nome_uc: extractField(text, /(?:\d+\s+)?([\w\s]+)\n.*RUA/) || 'Desconhecido',  // Capturing the name before the address
+    distribuidora: extractField(text, /(?:.*?\n)?([A-ZÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\s\.]+DISTRIBUIÇÃO\sS\.A\.)/)?.split('\n').pop()?.trim() || 'Desconhecida',
   };
 
   return invoiceData;

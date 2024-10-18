@@ -13,6 +13,8 @@ interface InvoiceAttributes {
   energia_compensada_valor: number;
   contrib_ilum_publica: number;
   valor_total: number;
+  nome_uc: string;
+  distribuidora: string;
 }
 
 // Tipagem para criação do modelo (campos opcionais durante a criação)
@@ -32,6 +34,8 @@ export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
   public energia_compensada_valor!: number;
   public contrib_ilum_publica!: number;
   public valor_total!: number;
+  public nome_uc!: string;
+  public distribuidora!: string;
 
   // Timestamps
   public readonly createdAt!: Date;
@@ -78,6 +82,14 @@ export function initializeInvoiceModel(sequelize: Sequelize) {
       },
       valor_total: {
         type: DataTypes.DOUBLE,
+      },
+      nome_uc: {
+        type: DataTypes.STRING, 
+        allowNull: true,
+      },
+      distribuidora: {
+        type: DataTypes.STRING, 
+        allowNull: true,
       },
     },
     {
