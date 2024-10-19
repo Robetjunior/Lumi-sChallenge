@@ -9,9 +9,9 @@
     "target": "es6",
     "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "lib": ["es6", "dom"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "tests/**/*.ts"],
+  "include": ["src/**/*", "src/**/*.d.ts", "tests/**/*.ts"],
   "exclude": ["node_modules"]
 }
