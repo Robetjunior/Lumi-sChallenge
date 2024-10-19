@@ -165,7 +165,7 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/:no_cliente/:mes_referencia', async (req, res) => {
+router.get('/:no_cliente/:mes_referencia', async (req: Request, res: Response) => {
   const { no_cliente, mes_referencia } = req.params;
   try {
     const invoice = await Invoice.findOne({ where: { no_cliente, mes_referencia } });
@@ -180,13 +180,14 @@ router.get('/:no_cliente/:mes_referencia', async (req, res) => {
 });
 
 // Excluir uma fatura (opcional)
-router.delete('/:id', async (req:any, res:any) => {
+router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
   console.log('teste')
   const { id } = req.params;
   try {
     const deletedInvoice = await Invoice.destroy({ where: { id: Number(id) } });
     if (!deletedInvoice) {
-      return res.status(404).json({ error: 'Fatura não encontrada' });
+      res.status(404).json({ error: 'Fatura não encontrada' });
+      return ;
     }
     res.status(204).send();
   } catch (error) {

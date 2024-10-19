@@ -1,9 +1,11 @@
 import express from 'express';
 import { Invoice } from '../../models/invoice';
 const router = express.Router();
+import { Request, Response } from 'express';
+
 
 // Rota para salvar os dados extraídos
-router.post('/invoices', async (req, res) => {
+router.post('/invoices', async (req: Request, res: Response) => {
   try {
     const invoiceData = req.body;
     const newInvoice = await Invoice.create(invoiceData);
@@ -14,7 +16,7 @@ router.post('/invoices', async (req, res) => {
 });
 
 // Rota para listar as faturas
-router.get('/invoices', async (req, res) => {
+router.get('/invoices', async (req: Request, res: Response) => {
   try {
     const invoices = await Invoice.findAll();
     res.status(200).json(invoices);
