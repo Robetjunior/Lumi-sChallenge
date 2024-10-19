@@ -33,4 +33,3 @@ const db = {
     Invoice,
 };
 exports.default = db;
-//# sourceMappingURL=index.js.map

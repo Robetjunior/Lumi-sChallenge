@@ -8,7 +8,7 @@ import bodyParser from 'body-parser';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors({
   origin: '*', // Permitir especificamente a origem do seu frontend

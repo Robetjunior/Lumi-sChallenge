@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { supabase } from '../../config/supabase';
+import { supabase } from '../../config/supabase'
 import fs from 'fs';
 import { extractInvoiceData } from '../services/extractInvoiceData'; // Função para extração de dados do PDF
 import { Invoice } from '../../models/invoice'; // Seu modelo de banco de dados

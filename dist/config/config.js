@@ -26,4 +26,3 @@ module.exports = {
         port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 6543,
     },
 };
-//# sourceMappingURL=config.js.map

@@ -37,4 +37,3 @@ router.get('/invoices', (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 }));
 exports.default = router;
-//# sourceMappingURL=index.js.map
