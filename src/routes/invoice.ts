@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { Request, Response } from 'express';
 import { supabase } from '../../config/supabase';
 import fs from 'fs';
 import { extractInvoiceData } from '../services/extractInvoiceData'; // Função para extração de dados do PDF
@@ -12,7 +13,7 @@ const upload = multer({ dest: 'uploads/' }); // Os arquivos enviados serão arma
 
 const router = Router();
 // Listar todas as faturas
-router.get('/', async (req: any, res: any) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const invoices = await Invoice.findAll();
     res.json(invoices);
@@ -23,9 +24,10 @@ router.get('/', async (req: any, res: any) => {
 
 
 // Inserir uma nova fatura
-router.post('/', upload.single('fatura_pdf'), async (req: any, res: any) => {
+router.post('/', upload.single('fatura_pdf'), async (req: Request, res: Response): Promise<void> => {
   if (!req.file) {
-    return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    return;
   }
 
   const filePath = req.file.path; // Caminho temporário onde o arquivo foi salvo
@@ -118,7 +120,7 @@ router.put('/:id', async (req:any, res:any) => {
   }
 });
 
-router.get('/search', async (req: any, res: any) => {
+router.get('/search', async (req: Request, res: Response) => {
   console.log('entrou aqui?')
   const { distributor, consumer, year } = req.query;
   console.log(distributor, consumer, year)
@@ -145,7 +147,7 @@ router.get('/search', async (req: any, res: any) => {
   }
 });
 
-router.get('/:id', async (req: any, res: any) => {
+router.get('/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   console.log(id)
   try {
@@ -194,7 +196,7 @@ router.delete('/:id', async (req:any, res:any) => {
 });
 
 // Cálculo de Consumo de Energia Elétrica (kWh) e Valor Total sem GD (R$)
-router.get('/calculos/:no_cliente/:mes_referencia', async (req: any, res: any) => {
+router.get('/calculos/:no_cliente/:mes_referencia', async (req: Request, res: Response) => {
   const { no_cliente, mes_referencia } = req.params;
   try {
     const invoice = await Invoice.findOne({ where: { no_cliente, mes_referencia } });
