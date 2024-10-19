@@ -15,6 +15,7 @@ interface InvoiceAttributes {
   valor_total: number;
   nome_uc: string;
   distribuidora: string;
+  pdf_url: string;
 }
 
 // Tipagem para criação do modelo (campos opcionais durante a criação)
@@ -36,6 +37,7 @@ export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
   public valor_total!: number;
   public nome_uc!: string;
   public distribuidora!: string;
+  public pdf_url!: string; // Adicionando a nova propriedade
 
   // Timestamps
   public readonly createdAt!: Date;
@@ -90,6 +92,10 @@ export function initializeInvoiceModel(sequelize: Sequelize) {
       distribuidora: {
         type: DataTypes.STRING, 
         allowNull: true,
+      },
+      pdf_url: {
+        type: DataTypes.STRING, // Armazena a URL do arquivo PDF
+        allowNull: false,
       },
     },
     {

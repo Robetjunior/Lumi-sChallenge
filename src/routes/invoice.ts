@@ -55,6 +55,8 @@ router.post('/', upload.single('fatura_pdf'), async (req: any, res: any) => {
       throw new Error(`Erro ao enviar o arquivo para o Supabase: ${uploadError.message}`);
     }
 
+    const fileUrl = `https://yhivluwnxpbqwntxnmtn.supabase.co/storage/v1/object/public/faturas/${fileName}`; // URL completa do arquivo no bucket
+
     console.log(`Upload realizado com sucesso: ${uploadData.path}`);
 
     // Sanitizar dados: Garantir que os campos obrigatórios não tenham valor null
@@ -70,7 +72,8 @@ router.post('/', upload.single('fatura_pdf'), async (req: any, res: any) => {
       contrib_ilum_publica: invoiceData.contrib_ilum_publica || 0,
       valor_total: invoiceData.valor_total || 0,
       nome_uc: invoiceData.nome_uc || '',
-      distribuidora: invoiceData.distribuidora || ''
+      distribuidora: invoiceData.distribuidora || '',
+      pdf_url: fileUrl, 
     };
 
     // Salvar os dados extraídos no banco de dados

@@ -44,7 +44,7 @@ export const extractInvoiceData = async (filePath: string): Promise<InvoiceData>
     valor_total: parseFloat(
       extractField(text, /Total\s+a\s+pagar.*\n.*R\$\s*([\d.,]+)/)?.replace('.', '').replace(',', '.') || '0'
     ),
-    nome_uc: extractField(text, /(?:\d+\s+)?([\w\s]+)\n.*RUA/) || 'Desconhecido',  // Capturing the name before the address
+    nome_uc: extractField(text, /(?:\d+\s+)?([\w\s]+)\n.*(?:RUA|AV|AVENIDA|ESTRADA|ALAMEDA|TRAVESSA|RODOVIA|PRAÇA|VIA)/i)?.split('\n').pop()?.trim() || 'Desconhecido',
     distribuidora: extractField(text, /(?:.*?\n)?([A-ZÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\s\.]+DISTRIBUIÇÃO\sS\.A\.)/)?.split('\n').pop()?.trim() || 'Desconhecida',
   };
 
