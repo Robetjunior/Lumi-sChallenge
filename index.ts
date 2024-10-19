@@ -10,7 +10,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // Habilitar CORS para todas as origens
+app.use(cors({
+  origin: '*', // Permitir todas as origens. Você pode especificar a URL do frontend, se preferir.
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Defina os métodos que serão permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'] // Defina os cabeçalhos permitidos
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
