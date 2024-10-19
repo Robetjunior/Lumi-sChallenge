@@ -82,7 +82,7 @@ router.post('/', upload.single('fatura_pdf'), async (req: Request, res: Response
     const newInvoice = await Invoice.create(sanitizedInvoiceData);
 
     // Remover o arquivo PDF local após o upload
-    fs.unlink(filePath, (err) => {
+    fs.unlink(filePath, (err) => { 
       if (err) {
         console.error(`Erro ao remover o arquivo: ${filePath}`, err);
       } else {
