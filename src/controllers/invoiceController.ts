@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { InvoiceService } from '../services/invoiceService'; // Importa o serviço correspondente
 import fs from 'fs';
-import { supabase } from '../../config/supabase'; // Configuração do Supabase
+import { supabase } from '../config/supabase'; // Configuração do Supabase
 import multer from 'multer';
 import { extractInvoiceData } from '../services/extractInvoiceData';
 

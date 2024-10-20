@@ -80,14 +80,13 @@ A API está hospedada no Heroku e pode ser acessada através do link abaixo:
 backend/
 ├── src/                      # Código-fonte principal
 │   ├── public/          
+│   ├── config/          
 │   ├── controllers/          # Controladores de API
 │   ├── services/             # Services de API
 │   ├── models/               # Modelos Sequelize
 │   ├── routes/               # Definição de rotas da API
 │   └── utils/                # Lógica de serviço e de negócio
-├── migrations/               # Arquivos de migração para o banco de dados
-├── models/
-├── config/
+│   └── models/                # Lógica de serviço e de negócio
 ├── .env                      # Arquivo de variáveis de ambiente
 ├── package.json              # Gerenciamento de dependências e scripts
 ├── README.md                 # Documentação do projeto
