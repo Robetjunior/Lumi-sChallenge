@@ -5,7 +5,7 @@
   "scripts": {
     "test": "jest",
     "migrate": "ts-node ./node_modules/.bin/sequelize-cli db:migrate",
-    "build": "npx tsc --project tsconfig.json",  // Certifique-se de que o build está compilando o TypeScript
+    "build": "tsc",  // Certifique-se de que o build está compilando o TypeScript
     "start": "node dist/index.js",  // Inicia o servidor a partir do arquivo compilado
     "dev": "nodemon --watch ./ --exec ts-node index.ts"
   },
