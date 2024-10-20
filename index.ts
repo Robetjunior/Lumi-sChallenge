@@ -11,7 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Configurações de CORS para permitir múltiplas origens e credenciais
-const allowedOrigins = ['https://lumi-front-82af2d71e234.herokuapp.com', 'https://outra-origem-permitida.com'];
 const corsOptions = {
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
