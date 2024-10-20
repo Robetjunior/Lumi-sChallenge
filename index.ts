@@ -13,13 +13,7 @@ const PORT = process.env.PORT || 3001;
 // Configurações de CORS para permitir múltiplas origens e credenciais
 const allowedOrigins = ['https://lumi-front-82af2d71e234.herokuapp.com', 'https://outra-origem-permitida.com'];
 const corsOptions = {
-  origin: (origin: any, callback: any) => {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Origem não permitida pelo CORS'));
-    }
-  },
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
   credentials: true, // Permitir o uso de credenciais (cookies, tokens de autenticação)
