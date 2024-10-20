@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { sequelize } from './models';
+import { sequelize } from './src/models';
 import invoiceRoutes from './src/routes/invoice';
 import bodyParser from 'body-parser';
 

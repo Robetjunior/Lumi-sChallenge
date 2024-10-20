@@ -1,5 +1,5 @@
 import express from 'express';
-import { Invoice } from '../../models/invoice';
+import { Invoice } from '../models/invoice';
 const router = express.Router();
 import { Request, Response } from 'express';
 

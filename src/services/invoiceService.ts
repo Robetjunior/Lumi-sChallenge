@@ -1,4 +1,4 @@
-import { Invoice } from '../../models/invoice'; // Modelo do banco de dados
+import { Invoice } from '../models/invoice'; // Modelo do banco de dados
 import { Op } from 'sequelize';
 
 // Função para buscar todas as faturas
