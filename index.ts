@@ -32,7 +32,12 @@ app.options('*', cors(corsOptions)); // Habilita preflight para todas as rotas
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Rotas
+// Rota inicial para exibir mensagem de boas-vindas
+app.get('/', (req: Request, res: Response) => {
+  res.send('Bem-vindo Lumis-Challenge');
+});
+
+// Rotas para faturas
 app.use('/api/invoices', invoiceRoutes);
 
 // Conexão com o banco de dados
