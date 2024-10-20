@@ -5,14 +5,10 @@
   "scripts": {
     "test": "jest",
     "migrate": "ts-node ./node_modules/.bin/sequelize-cli db:migrate",
-    "build": "tsc",  // Certifique-se de que o build está compilando o TypeScript
-    "start": "node dist/index.js",  // Inicia o servidor a partir do arquivo compilado
+    "build": "tsc",
+    "start": "node dist/index.js",
     "dev": "nodemon --watch ./ --exec ts-node index.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "@supabase/supabase-js": "^2.45.5",
     "@types/sequelize": "^4.28.20",
