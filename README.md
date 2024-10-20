@@ -81,6 +81,7 @@ backend/
 ├── src/                      # Código-fonte principal
 │   ├── public/          
 │   ├── controllers/          # Controladores de API
+│   ├── services/             # Services de API
 │   ├── models/               # Modelos Sequelize
 │   ├── routes/               # Definição de rotas da API
 │   └── utils/                # Lógica de serviço e de negócio
