@@ -21,6 +21,7 @@
     "pg": "^8.13.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.4",
+    "typescript": "^5.6.3",
     "undici": "^6.20.1"
   },
   "devDependencies": {
@@ -35,7 +36,6 @@
     "nodemon": "^3.1.7",
     "sequelize-cli": "^6.6.2",
     "ts-jest": "^29.2.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "ts-node": "^10.9.2"
   }
 }
