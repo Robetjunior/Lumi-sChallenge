@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "types": ["jest", "node"],
+    "outDir": "./dist",  // Certifique-se de que o arquivo compilado vai para a pasta dist
+    "rootDir": "./",     // Garante que todos os arquivos sejam incluídos
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -8,10 +9,8 @@
     "strict": true,
     "target": "es6",
     "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./",
     "lib": ["es6", "dom"]
   },
-  "include": ["src/**/*", "src/**/*.d.ts", "tests/**/*.ts"],
+  "include": ["./**/*.ts"], // Inclui todos os arquivos TypeScript
   "exclude": ["node_modules"]
 }
