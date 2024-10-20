@@ -1,16 +1,14 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",  // Certifique-se de que o arquivo compilado vai para a pasta dist
-    "rootDir": "./",     // Garante que todos os arquivos sejam incluídos
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "strict": true,
-    "target": "es6",
-    "module": "commonjs",
-    "lib": ["es6", "dom"]
+    "target": "ES6",                          // Define a versão do ECMAScript
+    "module": "commonjs",                      // Define o módulo padrão como CommonJS
+    "outDir": "./dist",                        // Diretório de saída para o código compilado
+    "strict": true,                            // Ativa verificação estrita de tipos
+    "esModuleInterop": true,                   // Suporte para importações padrão do ES6
+    "skipLibCheck": true,                      // Ignora verificação de tipos em bibliotecas
+    "forceConsistentCasingInFileNames": true,  // Força consistência no uso de letras maiúsculas/minúsculas
+    "resolveJsonModule": true                  // Permite importação de arquivos JSON
   },
-  "include": ["./**/*.ts"], // Inclui todos os arquivos TypeScript
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],                     // Inclui apenas arquivos dentro de src
+  "exclude": ["node_modules", "**/*.test.ts"]  // Exclui node_modules e testes
 }
