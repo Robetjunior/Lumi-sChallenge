@@ -1,7 +1,6 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 
-// Definição dos atributos do modelo Invoice
-interface InvoiceAttributes {
+export interface InvoiceAttributes {
   id: number;
   no_cliente: string;
   mes_referencia: string;
@@ -18,10 +17,8 @@ interface InvoiceAttributes {
   pdf_url: string;
 }
 
-// Tipagem para criação do modelo (campos opcionais durante a criação)
-interface InvoiceCreationAttributes extends Optional<InvoiceAttributes, 'id'> {}
+export interface InvoiceCreationAttributes extends Optional<InvoiceAttributes, 'id'> {}
 
-// Definição do modelo Invoice
 export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
   implements InvoiceAttributes {
   public id!: number;
@@ -37,15 +34,13 @@ export class Invoice extends Model<InvoiceAttributes, InvoiceCreationAttributes>
   public valor_total!: number;
   public nome_uc!: string;
   public distribuidora!: string;
-  public pdf_url!: string; // Adicionando a nova propriedade
+  public pdf_url!: string;
 
-  // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public readonly created_at!: Date;
+  public readonly updated_at!: Date;
 }
 
-// Função para inicializar o modelo Invoice
-export function initializeInvoiceModel(sequelize: Sequelize) {
+export function initializeInvoiceModel(sequelize: Sequelize): typeof Invoice {
   Invoice.init(
     {
       id: {
@@ -55,7 +50,7 @@ export function initializeInvoiceModel(sequelize: Sequelize) {
       },
       no_cliente: {
         type: DataTypes.STRING,
-        allowNull: true, // Permitir valores nulos
+        allowNull: true,
       },
       mes_referencia: {
         type: DataTypes.STRING,
@@ -86,23 +81,26 @@ export function initializeInvoiceModel(sequelize: Sequelize) {
         type: DataTypes.DOUBLE,
       },
       nome_uc: {
-        type: DataTypes.STRING, 
+        type: DataTypes.STRING,
         allowNull: true,
       },
       distribuidora: {
-        type: DataTypes.STRING, 
+        type: DataTypes.STRING,
         allowNull: true,
       },
       pdf_url: {
-        type: DataTypes.STRING, // Armazena a URL do arquivo PDF
+        type: DataTypes.STRING,
         allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: 'Invoice',
+      modelName: 'invoice',
       tableName: 'Invoices',
       timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+      underscored: true,
     }
   );
   
