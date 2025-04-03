@@ -10,6 +10,7 @@ export const listInvoices = async (req: Request, res: Response) => {
     const invoices = await InvoiceService.getAllInvoices();
     res.json(invoices);
   } catch (error) {
+    console.error('Erro em listInvoices:', error);
     res.status(500).json({ error: 'Erro ao buscar faturas' });
   }
 };
@@ -24,6 +25,7 @@ export const searchInvoices = async (req: Request, res: Response): Promise<void>
       res.json(invoices);
     }
   } catch (error) {
+    console.error('Erro em searchInvoices:', error);
     res.status(500).json({ error: 'Erro ao buscar faturas' });
   }
 };
@@ -42,46 +44,35 @@ export const createInvoice = async (req: Request, res: Response): Promise<void> 
     if (!fs.existsSync(filePath)) {
       throw new Error('Arquivo PDF não encontrado no caminho fornecido.');
     }
-
     const invoiceData = await extractInvoiceData(filePath);
     const fileBuffer = fs.readFileSync(filePath);
 
     const { data, error: uploadError } = await supabase.storage
       .from(bucketName)
-      .upload(`faturas/${fileName}.pdf`, fileBuffer, {
-        contentType: 'application/pdf',
-      });
+      .upload(`faturas/${fileName}.pdf`, fileBuffer, { contentType: 'application/pdf' });
 
     if (uploadError) {
       throw new Error(`Erro ao enviar o arquivo para o Supabase: ${uploadError.message}`);
     }
 
     const fileUrl = `https://atvtfhsozmrogcxvnecp.supabase.co/storage/v1/object/public/faturas/${fileName}`;
-
     const sanitizedInvoiceData = InvoiceService.sanitizeInvoiceData(invoiceData, fileUrl);
     const newInvoice = await InvoiceService.createInvoice(sanitizedInvoiceData);
 
-    fs.unlink(filePath, (err) => { 
-      if (err) {
-        console.error(`Erro ao remover o arquivo: ${filePath}`, err);
-      }
+    fs.unlink(filePath, (err) => {
+      if (err) console.error(`Erro ao remover o arquivo: ${filePath}`, err);
     });
 
     res.status(201).json(newInvoice);
   } catch (error) {
-    console.error('Erro ao processar a fatura PDF:', error);
-
+    console.error('Erro em createInvoice:', error);
     fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error(`Erro ao remover o arquivo após falha: ${filePath}`, err);
-      }
+      if (err) console.error(`Erro ao remover o arquivo após falha: ${filePath}`, err);
     });
-
     res.status(500).json({ error: 'Erro ao processar o arquivo PDF e salvar a fatura' });
   }
 };
 
-// Buscar uma fatura por ID
 export const getInvoiceById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -92,6 +83,7 @@ export const getInvoiceById = async (req: Request, res: Response) => {
       res.status(404).json({ error: 'Fatura não encontrada' });
     }
   } catch (error) {
+    console.error('Erro em getInvoiceById:', error);
     res.status(500).json({ error: 'Erro ao buscar fatura' });
   }
 };
@@ -106,6 +98,7 @@ export const updateInvoice = async (req: Request, res: Response) => {
       res.json({ message: 'Fatura atualizada com sucesso' });
     }
   } catch (error) {
+    console.error('Erro em updateInvoice:', error);
     res.status(500).json({ error: 'Erro ao atualizar fatura' });
   }
 };
@@ -120,6 +113,7 @@ export const deleteInvoice = async (req: Request, res: Response) => {
       res.status(204).send();
     }
   } catch (error) {
+    console.error('Erro em deleteInvoice:', error);
     res.status(500).json({ error: 'Erro ao excluir fatura' });
   }
 };
@@ -134,19 +128,12 @@ export const calculateEnergyUsage = async (req: Request, res: Response) => {
       res.status(404).json({ error: 'Fatura não encontrada para cálculo' });
     }
   } catch (error) {
+    console.error('Erro em calculateEnergyUsage:', error);
     res.status(500).json({ error: 'Erro ao calcular variáveis' });
   }
 };
 
-type UploadResult =
-  | { file: string; status: 'ok'; invoice: any }
-  | { file: string; status: 'error'; message: string };
-
-/**
- * Função para processar vários arquivos PDF em uma pasta e criar as faturas correspondentes.
- */
 export const uploadInvoicesFromFolder = async (req: Request, res: Response): Promise<void> => {
-  console.log('Upload de faturas iniciado...');
   const folderPath = path.join(__dirname, '../faturas');
 
   try {
@@ -156,63 +143,27 @@ export const uploadInvoicesFromFolder = async (req: Request, res: Response): Pro
       return;
     }
 
-    const results: UploadResult[] = [];
-
+    const results: Array<{ file: string; status: 'ok' | 'error'; invoice?: any; message?: string }> = [];
     for (const file of files) {
       const filePath = path.join(folderPath, file);
       try {
-        // Verifica se o arquivo existe
         if (!fs.existsSync(filePath)) {
           throw new Error('Arquivo não encontrado.');
         }
-
-        // Extrai os dados da fatura do PDF
         const invoiceData = await extractInvoiceData(filePath);
-
-        // Lê o arquivo em Buffer
         const fileBuffer = fs.readFileSync(filePath);
-        console.log(`Arquivo: ${file}, tamanho do buffer: ${fileBuffer.length}`);
-
-        // // Faz o upload do PDF para o Supabase Storage na subpasta "faturas"
-        // const { data: uploadData, error: uploadError } = await supabase.storage
-        //   .from(bucketName)
-        //   .upload(`${file}`, fileBuffer, {
-        //     contentType: 'application/pdf',
-        //   });
-
-        // if (uploadError) {
-        //   throw new Error(`Erro ao enviar o arquivo ${file}: ${uploadError.message}`);
-        // }
-
-        // Constrói a URL pública do arquivo
         const fileUrl = `https://atvtfhsozmrogcxvnecp.supabase.co/storage/v1/object/public/faturas/${file}`;
-
-        // Opcional: se desejar, valide a URL antes de prosseguir
-        // const isValid = await validateFileUrl(fileUrl);
-        // if (!isValid) {
-        //   throw new Error(`O arquivo não foi encontrado na URL: ${fileUrl}`);
-        // }
-
-        // Sanitiza os dados da fatura, incluindo a URL do PDF
         const sanitizedInvoiceData = InvoiceService.sanitizeInvoiceData(invoiceData, fileUrl);
-
-        // Cria a fatura no banco de dados
         const newInvoice = await InvoiceService.createInvoice(sanitizedInvoiceData);
-
-        // Remove o arquivo local (opcional)
         fs.unlink(filePath, (err) => {
-          if (err) {
-            console.error(`Erro ao remover o arquivo: ${filePath}`, err);
-          }
+          if (err) console.error(`Erro ao remover o arquivo: ${filePath}`, err);
         });
-
         results.push({ file, status: 'ok', invoice: newInvoice });
       } catch (err: any) {
         console.error(`Erro ao processar ${file}:`, err.message);
         results.push({ file, status: 'error', message: err.message || 'Erro desconhecido' });
       }
     }
-
     res.status(201).json({ message: 'Upload concluído.', results });
   } catch (err) {
     console.error('Erro geral ao processar os arquivos:', err);

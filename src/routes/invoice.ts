@@ -22,7 +22,6 @@ router.get('/search', searchInvoices);
 router.post('/importar-pasta', uploadInvoicesFromFolder);
 router.get('/dashboard', getDashboardData);
 
-// Rotas dinâmicas devem ser definidas depois:
 router.get('/:id', getInvoiceById);
 router.put('/:id', updateInvoice);
 router.delete('/:id', deleteInvoice);
