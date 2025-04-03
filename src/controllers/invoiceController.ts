@@ -219,3 +219,22 @@ export const uploadInvoicesFromFolder = async (req: Request, res: Response): Pro
     res.status(500).json({ error: 'Erro ao processar os arquivos da pasta.' });
   }
 };
+
+export const getDashboardData = async (req: Request, res: Response): Promise<void> => {
+  const { year } = req.query;
+  if (!year) {
+    res.status(400).json({ error: 'Ano não informado' });
+    return;
+  }
+  try {
+    const dashboardData = await InvoiceService.getDashboardData(year as string);
+    if (dashboardData) {
+      res.json(dashboardData);
+    } else {
+      res.status(404).json({ error: 'Nenhuma fatura encontrada para o ano informado' });
+    }
+  } catch (error) {
+    console.error('Erro na rota getDashboardData:', error);
+    res.status(500).json({ error: 'Erro ao obter dados consolidados do dashboard' });
+  }
+};
