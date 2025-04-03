@@ -51,7 +51,7 @@ export const InvoiceService = {
       }
       const [month, invoiceYear] = parts;
       if (invoiceYear === year) {
-        const key = `${invoiceYear}-${month}`;
+        const key = `${month}-${invoiceYear}`;
         if (!groups[key]) {
           groups[key] = { name: key, totalKwh: 0, totalCompensada: 0, totalFinance: 0, totalEconomia: 0 };
         }
