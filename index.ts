@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { sequelize } from './src/models';
 import invoiceRoutes from './src/routes/invoice';
 import bodyParser from 'body-parser';
+import { errorHandler } from './src/middlewares/erroHandler'
 
 dotenv.config();
 
@@ -28,6 +29,8 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api/invoices', invoiceRoutes);
+
+app.use(errorHandler);
 
 sequelize.authenticate()
   .then(() => {

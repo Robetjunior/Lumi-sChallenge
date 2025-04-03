@@ -1,21 +1,22 @@
+// src/controllers/invoiceController.ts
 import path from 'path';
 import fs from 'fs';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { extractInvoiceData } from '../services/extractInvoiceData';
 import { InvoiceService } from '../services/invoiceService';
 import { supabase } from '../config/supabase';
 
-export const listInvoices = async (req: Request, res: Response) => {
+export const listInvoices = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const invoices = await InvoiceService.getAllInvoices();
     res.json(invoices);
   } catch (error) {
     console.error('Erro em listInvoices:', error);
-    res.status(500).json({ error: 'Erro ao buscar faturas' });
+    next(error);
   }
 };
 
-export const searchInvoices = async (req: Request, res: Response): Promise<void> => {
+export const searchInvoices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { distributor, consumer, year } = req.query;
     const invoices = await InvoiceService.searchInvoices(distributor as string, consumer as string, year as string);
@@ -26,11 +27,11 @@ export const searchInvoices = async (req: Request, res: Response): Promise<void>
     }
   } catch (error) {
     console.error('Erro em searchInvoices:', error);
-    res.status(500).json({ error: 'Erro ao buscar faturas' });
+    next(error);
   }
 };
 
-export const createInvoice = async (req: Request, res: Response): Promise<void> => {
+export const createInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   if (!req.file) {
     res.status(400).json({ error: 'Nenhum arquivo enviado' });
     return;
@@ -38,7 +39,7 @@ export const createInvoice = async (req: Request, res: Response): Promise<void> 
 
   const filePath = req.file.path;
   const fileName = req.file.filename;
-  const bucketName = 'faturas'; 
+  const bucketName = 'faturas';
 
   try {
     if (!fs.existsSync(filePath)) {
@@ -64,16 +65,17 @@ export const createInvoice = async (req: Request, res: Response): Promise<void> 
     });
 
     res.status(201).json(newInvoice);
+    return;
   } catch (error) {
     console.error('Erro em createInvoice:', error);
     fs.unlink(filePath, (err) => {
       if (err) console.error(`Erro ao remover o arquivo após falha: ${filePath}`, err);
     });
-    res.status(500).json({ error: 'Erro ao processar o arquivo PDF e salvar a fatura' });
+    next(error);
   }
 };
 
-export const getInvoiceById = async (req: Request, res: Response) => {
+export const getInvoiceById = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
     const invoice = await InvoiceService.getInvoiceById(Number(id));
@@ -84,11 +86,11 @@ export const getInvoiceById = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error('Erro em getInvoiceById:', error);
-    res.status(500).json({ error: 'Erro ao buscar fatura' });
+    next(error);
   }
 };
 
-export const updateInvoice = async (req: Request, res: Response) => {
+export const updateInvoice = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
     const updatedInvoice = await InvoiceService.updateInvoice(Number(id), req.body);
@@ -99,11 +101,11 @@ export const updateInvoice = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error('Erro em updateInvoice:', error);
-    res.status(500).json({ error: 'Erro ao atualizar fatura' });
+    next(error);
   }
 };
 
-export const deleteInvoice = async (req: Request, res: Response) => {
+export const deleteInvoice = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
     const deletedInvoice = await InvoiceService.deleteInvoice(Number(id));
@@ -114,11 +116,11 @@ export const deleteInvoice = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error('Erro em deleteInvoice:', error);
-    res.status(500).json({ error: 'Erro ao excluir fatura' });
+    next(error);
   }
 };
 
-export const calculateEnergyUsage = async (req: Request, res: Response) => {
+export const calculateEnergyUsage = async (req: Request, res: Response, next: NextFunction) => {
   const { no_cliente, mes_referencia } = req.params;
   try {
     const calculationResult = await InvoiceService.calculateEnergyUsage(no_cliente, mes_referencia);
@@ -129,11 +131,11 @@ export const calculateEnergyUsage = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error('Erro em calculateEnergyUsage:', error);
-    res.status(500).json({ error: 'Erro ao calcular variáveis' });
+    next(error);
   }
 };
 
-export const uploadInvoicesFromFolder = async (req: Request, res: Response): Promise<void> => {
+export const uploadInvoicesFromFolder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const folderPath = path.join(__dirname, '../faturas');
 
   try {
@@ -165,13 +167,13 @@ export const uploadInvoicesFromFolder = async (req: Request, res: Response): Pro
       }
     }
     res.status(201).json({ message: 'Upload concluído.', results });
+    return;
   } catch (err) {
-    console.error('Erro geral ao processar os arquivos:', err);
-    res.status(500).json({ error: 'Erro ao processar os arquivos da pasta.' });
+    next(err);
   }
 };
 
-export const getDashboardData = async (req: Request, res: Response): Promise<void> => {
+export const getDashboardData = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { year } = req.query;
   if (!year) {
     res.status(400).json({ error: 'Ano não informado' });
@@ -181,11 +183,13 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
     const dashboardData = await InvoiceService.getDashboardData(year as string);
     if (dashboardData) {
       res.json(dashboardData);
+      return;
     } else {
       res.status(404).json({ error: 'Nenhuma fatura encontrada para o ano informado' });
+      return;
     }
   } catch (error) {
     console.error('Erro na rota getDashboardData:', error);
-    res.status(500).json({ error: 'Erro ao obter dados consolidados do dashboard' });
+    next(error);
   }
 };
